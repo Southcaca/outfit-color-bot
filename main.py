@@ -1,29 +1,48 @@
 import os
-import datetime
 import requests
+import datetime
 
-def get_lucky_color():
-    today = datetime.datetime.now()
-    weekday = "一二三四五六日"[today.weekday()]
-    main_color = "深藍色"
-    sub_color = "銀色"
-    return f"今天是 {today.month}/{today.day}（{weekday}）\n適合穿上 {main_color} 配一點 {sub_color}，穩穩的氣場＋一點閃亮小巧思！\n今天的貴人可能就在妳身邊，記得多微笑～穿得對，運氣就來對！"
+def get_today_color():
+    today = datetime.date.today()
+    weekday = today.weekday()  # 0=Monday, 6=Sunday
 
-def send_line_notify(msg):
-    url = "https://api.line.me/v2/bot/message/push"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {os.getenv('LINE_CHANNEL_ACCESS_TOKEN')}"
+    color_map = {
+        0: "紅色",   # Monday
+        1: "粉紅色", # Tuesday
+        2: "綠色",   # Wednesday
+        3: "橘色",   # Thursday
+        4: "藍色",   # Friday
+        5: "紫色",   # Saturday
+        6: "黃色"    # Sunday
     }
+
+    return color_map.get(weekday, "未知")
+
+def send_line_notify(message):
+    token = os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
+    if not token:
+        print("Error: LINE_CHANNEL_ACCESS_TOKEN not set.")
+        return
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+
     data = {
-        "to": os.getenv("USER_LINE_ID"),
+        "to": os.getenv("LINE_USER_ID"),
         "messages": [{
             "type": "text",
-            "text": msg
+            "text": message
         }]
     }
-    requests.post(url, headers=headers, json=data)
+
+    response = requests.post("https://api.line.me/v2/bot/message/push", headers=headers, json=data)
+    print("LINE response:", response.status_code, response.text)
 
 if __name__ == "__main__":
-    message = get_lucky_color()
+    today = datetime.date.today()
+    color = get_today_color()
+    message = f"今天是 {today.strftime('%Y年%m月%d日')}，貝卡建議的穿搭幸運色是「{color}」！"
+    print("Sending message:", message)
     send_line_notify(message)
