@@ -1,2 +1,2 @@
-# outfit-color-bot
-貝卡的穿搭日報 LINE Bot
+# 貝卡的穿搭日報
+這是一個每天早上 7:00 自動推播穿搭建議的 LINE bot。
