@@ -1,6 +1,6 @@
 services:
   - type: cron
-    name: daily-outfit-bot
+    name: outfit-color-cronjob
     schedule: "0 0 * * *"
     env: python
     buildCommand: "pip install -r requirements.txt"
