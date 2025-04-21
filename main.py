@@ -1,4 +1,3 @@
-
 import requests
 import datetime
 
@@ -27,8 +26,3 @@ if __name__ == "__main__":
     user_id = "U0b3096d68edce6d5b38132042362be9d"  # southcaca 的 LINE user ID
     message = get_today_message()
     send_line_message(access_token, user_id, message)
-幸運配飾：{accessory} 💍
-推薦歌曲：{song} 🎶
-{song_link}
-祝你今天心情愉快！😊"""
-    send_line_notify(message)
