@@ -3,64 +3,66 @@ import requests
 import random
 from datetime import datetime
 
-# LINE Bot 資訊
-ACCESS_TOKEN = os.environ['LINE_CHANNEL_ACCESS_TOKEN']
-USER_ID = os.environ['LINE_CHANNEL_USER_ID']
-URL = 'https://api.line.me/v2/bot/message/push'
+# LINE API 設定
+ACCESS_TOKEN = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN")
+USER_ID = os.environ.get("LINE_CHANNEL_USER_ID")
 
 headers = {
-    'Content-Type': 'application/json',
-    'Authorization': f'Bearer {ACCESS_TOKEN}'
+    "Content-Type": "application/json",
+    "Authorization": f"Bearer {ACCESS_TOKEN}"
 }
 
-# 模擬吉色分級推薦
-colors = [
-    ("紅色", "大吉 ❤️"),
-    ("粉紅", "大吉 💗"),
-    ("藍色", "次吉 💙"),
-    ("白色", "次吉 🤍"),
-    ("黃色", "吉 💛"),
-    ("綠色", "吉 💚"),
+# 顏色分級與穿搭建議
+color_levels = [
+    {
+        "color": "紅色",
+        "level": "大吉 ❤️",
+        "advice": "紅色連身裙＋紅唇，展現熱情與自信"
+    },
+    {
+        "color": "粉紅色",
+        "level": "次吉 💗",
+        "advice": "粉嫩針織上衣＋珍珠耳環，氣質滿分"
+    },
+    {
+        "color": "白色",
+        "level": "吉 🤍",
+        "advice": "白襯衫＋米杏色長褲，氣場清爽又專業"
+    }
 ]
 
-# 模擬幸運配飾
+# 幸運配飾建議
 accessories = [
-    "金色耳環",
+    "玫瑰金耳環",
     "銀色手環",
     "珍珠項鍊",
-    "圓形戒指",
-    "玫瑰金手錶",
-    "小香風別針",
+    "藍寶石戒指",
+    "金色髮夾"
 ]
 
-# 模擬歌曲推薦（可換連結）
+# 推薦歌曲（可依五行拓展）
 songs = [
-    ("Daylight – Taylor Swift", "https://youtu.be/NutJRqqY6hE"),
-    ("Walking on Sunshine – Katrina & The Waves", "https://youtu.be/iPUmE-tne5U"),
     ("笑一個吧 – 吳汶芳", "https://youtu.be/DKn6lR_GQZs"),
-    ("青空 – aiko", "https://youtu.be/ncX2SBIaVuY"),
+    ("Walking on Sunshine – Katrina & The Waves", "https://youtu.be/iPUmE-tne5U"),
+    ("綠光 – 孫燕姿", "https://youtu.be/V7fvJ5o2Keg"),
+    ("青空 – aiko", "https://youtu.be/ncX2SBIaVuY")
 ]
 
-# 產生今天訊息
+# 組裝訊息內容
 today = datetime.now().strftime("%Y/%m/%d")
-color, fortune = random.choice(colors)
+selected_colors = color_levels[:3]
 accessory = random.choice(accessories)
 song_title, song_link = random.choice(songs)
 
-message = f"""👗 {today} 的穿搭幸運色提醒來囉！
+message = f"👗 {today} 的穿搭幸運色提醒來囉～\\n\\n建議貝卡今天可以穿點這些顏色：\\n"
+for item in selected_colors:
+    message += f"\\n- {item['color']}（{item['level']}）：{item['advice']}"
 
-建議貝卡今天可以穿「{color}」✨
-▶ 幸運等級：{fortune}
+message += f"\\n\\n💍 幸運配飾建議：{accessory}"
+message += f"\\n\\n🎵 今日推薦歌曲：\\n{song_title}\\n{song_link}"
+message += "\\n\\n今天也穿得剛剛好，氣場滿分唷～🌟"
 
-幸運配飾: {accessory} 💍
-
-🎵 今日推薦歌曲：
-{song_title}
-{song_link}
-
-祝妳一整天順順順，走到哪裡都有好運氣 💖
-"""
-
+# 傳送 LINE 訊息
 body = {
     "to": USER_ID,
     "messages": [{
@@ -69,6 +71,6 @@ body = {
     }]
 }
 
-response = requests.post(URL, headers=headers, json=body)
+response = requests.post("https://api.line.me/v2/bot/message/push", headers=headers, json=body)
 print("Status Code:", response.status_code)
 print("Response:", response.text)
